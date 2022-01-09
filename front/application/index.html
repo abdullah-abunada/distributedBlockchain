@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- BASIC META-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grading System - Using Blockchain</title>
+    <!-- FAVICON -->
+    <link rel="apple-touch-icon" href="asset/img/favicon/apple-touch-icon.png">
+    <link rel="icon" href="asset/img/favicon/favicon.ico">
+    <!-- WEB FONTS  -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+    <!-- BOOTSTRAP MIN CSS -->
+    <link href="asset/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ALL PLUGINS CSS -->
+    <link href="asset/css/elements.css" rel="stylesheet">
+    <link rel="stylesheet" href="asset/css/sweetalert2.min.css">
+    <!-- THEME STYLE CSS -->
+    <link href="asset/style.css" rel="stylesheet">
+    <!-- RESPONSIVE CSS -->
+    <link href="asset/responsive.css" rel="stylesheet">
+    <!-- HEAD LIBS -->
+    <script src="asset/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    <style rel="stylesheet" type="text/css">
+        .nice-select {
+            height: 42px;
+        }
+    </style>
+</head>
+
+<body ng-app="BlockExplorer">
+<div ng-controller="MainController" data-ng-init="init()">
+    <!-- NAVIGATION -->
+    <div class="navigation-bar stick">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="logo">
+                        <a class="navbar-brand" href="#"><img src="asset/img/logo/logo.png" alt="logo"></a>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="navigation">
+                        <ul class="list-inline text-right" id="mainmenu">
+                            <button style="font-weight:400;border-radius:5px;font-size: 12px;" data-toggle="modal"
+                                    data-target="#exampleModal"
+                                    type="submit" class="btn btn-blue">Create New Transaction
+                            </button>
+                            <li class="shop-plan dropdown"><a href="#">
+                                <img class="bag-icon" src="asset/img/icons/pending.png" alt="bag-icon">
+                                <span class="badge label-danger"
+                                      style="position: absolute; left: 35px; top: 14px;">{{ pendingTransactions.length
+                                    }}</span></a>
+                                <div class="shop-plan-chart dropdown-nav" ng-if="pendingTransactions.length > 0">
+                                    <div class="single-shop-plan" ng-repeat="(key, transaction) in pendingTransactions">
+                                        <p class="shop-items">
+                                            <b>From: </b>{{transaction.fromAddress.substring(0, 25) + '...'}}</p>
+                                        <p class="shop-items"><b>To: </b>{{ transaction.toAddress}}</p>
+                                        <p class="shop-items"><b>Course ID: </b>{{ transaction.course.courseID}}</p>
+                                        <p class="shop-items"><b>Grade: </b>{{ transaction.course.finalMark}}</p>
+                                        <hr>
+                                    </div>
+                                    <button ng-click="mineBlock()"
+                                            class="pricing-btn blue-btn homepage-one-all-features-btn action-btn slider-links-2 chart-btn">
+                                        Mine Transactions
+                                    </button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /MOBILE NAVIGATION -->
+    <!-- /NAVIGATION -->
+    <!-- ABOUT UA AREA -->
+    <section class="domain-search-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="domain-content-table">
+                        <div class="domain-content-table-sell">
+                            <div class="domain-heading">
+                                <h2>Block Explorer</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ABOUT UA AREA END -->
+    <!-- BLOCK SEARCH AREA  -->
+    <section class="domain-now-area ">
+        <div class="container domain-inner">
+            <div class="row domain-checkup">
+                <form ng-submit="search(searchValue)">
+                    <div class="domain-checkup-left">
+                        <div class="input-field-row">
+                            <input type="text" class="domain-input" ng-model="searchValue"
+                                   placeholder="Enter Block Hash, Transaction ID, or Address Here!">
+                            <select class="nice-select" ui-nice-select ng-model="searchType">
+                                <option value="block">Block Hash</option>
+                                <option value="transaction">Transaction ID</option>
+                                <option value="address">Address</option>
+                                <option value="blockchain">Blockchain</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="domain-checkup-right">
+                        <button type="submit">
+                            <img src="asset/img/icons/search-icon.png" alt="Search icon">
+                            Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Block SEARCH AREA END -->
+    <!-- BLOCKS LIST AREA -->
+    <section ng-if="blocks.length > 0"
+             class="homepage-2 pricing-table-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="section-title">
+                        <h2><span>Blocks</span> on chain</h2>
+                        <img src="asset/img/section-shape.png" alt="section-shape">
+                        <p>Each card represents a block on the chain. Click on a block to see the transactions stored
+                            inside.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div ng-repeat="(key, block) in blocks" ng-if="blocks.length > 0" class="col-md-4 col-sm-4 "
+                     style="margin-bottom: 30px;">
+                    <div class="single-pricing-table">
+                        <h2>Block {{block.index}} <span ng-if="block.index == 1">(Genesis block)</span></h2>
+                        <img src="asset/img/pricing-icon/pricing-icon-4.png" alt="pricing-icon">
+                        <div class="pricing-amount">
+                            <sup><span class="currency"></span></sup>
+                            <span class="price">
+                              {{ block.transactions.length}}
+                          </span>
+                            <span class="subscription">
+                              Transactions
+                          </span>
+                        </div>
+                        <div class="pricing-content">
+                            <ul>
+                                <li>
+                                    <span><b>Hash:</b></span>
+                                    <p>{{ block.hash.substring(0, 35)}}...</p>
+                                </li>
+                                <li>
+                                    <span><b>Hash of previous block:</b></span>
+                                    <p>{{block.previousHash.toString().substring(0, 35)}} <span ng-if="block.index > 1">...</span>
+                                    </p>
+                                </li>
+                                <li>
+                                    <span><b>Nonce:</b></span>
+                                    <p>{{ block.nonce}}</p>
+                                </li>
+                                <li>
+                                    <span><b>Timestamp:</b></span>
+                                    <p>{{block.timestamp}}</p>
+                                    <p class="text-muted">
+                                        <small>{{block.timestamp | date:'medium'}}</small></p>
+                                </li>
+                            </ul>
+                            <button class="pricing-btn blue-btn" ng-click="showTransactions(key)">SHOW
+                                TRANSACTIONS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- BLOCKS LIST AREA END -->
+    <!--BLOCK TRANSACTIONS AREA -->
+    <section ng-if="selectedBlockIndex" class="domain-chart-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Transactions inside block ({{selectedBlockIndex}})</h2>
+                    <div class="domain-chart-heading">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">From</th>
+                                    <th scope="col">To</th>
+                                    <th>CourseID</th>
+                                    <th scope="col">Grade</th>
+                                    <th>Is Valid?</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-if="transactions.length > 0" ng-repeat="(key, transaction) in transactions">
+                                    <td>{{ key + 1}}</td>
+                                    <td>{{ transaction.fromAddress.substring(0, 45)}}...</td>
+                                    <td>{{transaction.toAddress}}</td>
+                                    <td>{{transaction.course.courseID}}</td>
+                                    <td>{{transaction.course.finalMark}}</td>
+                                    <td>
+                                        <span>✓</span>
+                                    </td>
+                                </tr>
+                                <tr ng-if="transactions.length == 0">
+                                    <td style="text-align: center" colspan="6">There is no nay transactions in this
+                                        selected Block!
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--BLOCK TRANSACTIONS AREA END-->
+    <!--ADDRESS TRANSACTIONS AREA -->
+    <section ng-if="addressData" class="domain-chart-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Transactions of Address (120201263)</h2>
+                    <div class="domain-chart-heading">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">From</th>
+                                    <th>CourseID</th>
+                                    <th scope="col">Grade</th>
+                                    <th>Is Valid?</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-if="addressData.transactions.length > 0"
+                                    ng-repeat="(key, transaction) in addressData.transactions">
+                                    <td>{{ key + 1}}</td>
+                                    <td>{{ transaction.fromAddress.substring(0, 45)}}...</td>
+                                    <td>{{transaction.course.courseID}}</td>
+                                    <td>{{transaction.course.finalMark}}</td>
+                                    <td>
+                                        <span>✓</span>
+                                    </td>
+                                </tr>
+                                <tr ng-if="addressData.transactions.length == 0">
+                                    <td style="text-align: center" colspan="6">There is no nay transactions for this
+                                        Address!
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th>GPA:</th>
+                                    <th colspan="5" style="text-align: center;">{{addressData.gpa}}%</th>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--ADDRESS TRANSACTIONS AREA END-->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Transaction</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="digita-contact-form"
+                      ng-submit="createTransaction(courseID, sectionNum, finalMark, fromAddress, toAddress)">
+                    <div class="modal-body leave-comment-area">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="single-input">
+                                    <h4>From*</h4>
+                                    <div class="form-group">
+                                        <input disabled type="text" class="form-control" ng-model="fromAddress"
+                                               value="6db81549ba063254881b8755b54febe7ca16a0f05d8af782be2d06f8acc270e9">
+                                    </div>
+                                </div>
+                                <div class="single-input">
+                                    <h4>To*</h4>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="Email" ng-model="toAddress">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-5">
+                                <div class="single-input">
+                                    <div class="single-input">
+                                        <h4>Course ID*</h4>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" ng-model="courseID">
+                                        </div>
+                                    </div>
+                                    <div class="single-input">
+                                        <h4>Section Num*</h4>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" ng-model="sectionNum">
+                                        </div>
+                                    </div>
+                                    <div class="single-input">
+                                        <h4>Total Mark*</h4>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" ng-model="finalMark">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--FOOTER-BOTTOM-AREA -->
+    <section class="foter-botom-area ">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-12 ">
+                    <p>Copyright &copy; 2021 For educational purposes only. <a href="#">Source Code</a></p>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12 ">
+                    <div class="payment-getway text-right">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--FOOTER-BOTTOM-AREA -->
+</div>
+</body>
+<script src="asset/js/jquery.min.js"></script>
+<script src="asset/js/angular.min.js"></script>
+<script src="asset/js/bootstrap.min.js"></script>
+<script src="asset/js/plugins.js"></script>
+<script src="asset/js/main.js"></script>
+<script type='text/javascript' src='asset/js/jquery.nice-select.min.js'></script>
+<script src="asset/js/angular-nice-select.js"></script>
+<script src="asset/js/sweetalert2.all.min.js"></script>
+
+<script>
+    window.app = angular.module('BlockExplorer', ["ui.nice-select"]);
+
+    app.controller('MainController', function ($scope, $http) {
+        $scope.blocks = [];
+        $scope.selectedBlockIndex = null;
+        $scope.pendingTransactions = []
+        $scope.transactions = [];
+        $scope.block = null;
+        $scope.transaction = null;
+        $scope.addressData = null;
+        $scope.initialSearchMade = false;
+        $scope.showBlocks = false;
+        $scope.searchType = 'block'
+        $scope.fromAddress = "6db81549ba063254881b8755b54febe7ca16a0f05d8af782be2d06f8acc270e9"
+        $scope.init = function () {
+            $scope.fetchBlockchain();
+        }
+
+        $scope.showTransactions = function (key) {
+            $scope.transactions = $scope.blocks[key].transactions
+            $scope.selectedBlockIndex = $scope.blocks[key].index;
+            console.log($scope.transactions)
+        }
+
+        $scope.fetchBlock = function (blockHash) {
+            $http.get(`http://localhost/blocks/${blockHash}`)
+                .then(response => {
+                    $scope.blocks = []
+                    $scope.blocks.push(response.data.block);
+                    $scope.transaction = null;
+                    $scope.addressData = null;
+                    $scope.transactions = [];
+                });
+        };
+
+        $scope.fetchTransaction = function (transactionId) {
+            $http.get(`http://localhost/transactions/${transactionId}`)
+                .then(response => {
+                    $scope.transaction = response.data.block.transactions.find(transaction => {
+                        return transaction.transactionId === transactionId
+                    });
+                    $scope.blocks = [];
+                    $scope.blocks.push(response.data.block);
+                    $scope.transactions = [];
+                    $scope.transactions = [...response.data.block.transactions]
+                    $scope.addressData = null;
+                });
+        };
+
+        $scope.fetchAddressData = function (address) {
+            $http.get(`http://localhost/address/${address}`)
+                .then(response => {
+                    $scope.addressData = response.data;
+                    if (!$scope.addressData.transactions.length)
+                        $scope.addressData = null;
+                    $scope.block = null;
+                    $scope.transaction = null;
+                    $scope.blocks = [];
+                    $scope.transactions = [];
+                    $scope.selectedBlockIndex = null
+                });
+        };
+
+        $scope.fetchBlockchain = function () {
+            $http.get(`http://localhost/blockchain`)
+                .then(response => {
+                    $scope.blocks = response.data.chain;
+                    $scope.pendingTransactions = response.data.pendingTransactions;
+                    if (!$scope.blocks.length)
+                        $scope.blocks = [];
+                    $scope.block = null;
+                    $scope.transaction = null;
+                    $scope.transactions = [];
+                    $scope.selectedBlockIndex = null
+                    $scope.addressData = null
+                });
+        };
+
+        $scope.createTransaction = function (courseID, sectionNum, finalMark, fromAddress, toAddress) {
+            $http.post(`http://localhost/transactions/broadcast`, {
+                "course": {
+                    "courseID": courseID,
+                    "sectionNum": sectionNum,
+                    "finalMark": finalMark
+                },
+                "fromAddress": fromAddress,
+                "toAddress": toAddress
+            }).then(response => {
+                $scope.fetchBlockchain();
+                Swal.fire('Added!', 'Transaction has been added successfully', 'success')
+            });
+        };
+
+        $scope.mineBlock = function () {
+            $http.get(`http://localhost/mine`)
+                .then(response => {
+                    $scope.blocks = [];
+                    $scope.blocks.push(response.data.block);
+                    $scope.block = null;
+                    $scope.transaction = null;
+                    $scope.transactions = [];
+                    $scope.selectedBlockIndex = null
+                    $scope.addressData = null
+                    Swal.fire('Mined!', 'Transaction has been mined successfully', 'success')
+                    $scope.fetchBlockchain();
+                });
+        };
+
+        $scope.search = function (searchValue) {
+            console.log($scope.searchType)
+            $scope.initialSearchMade = true;
+            if ($scope.searchType === 'block') {
+                $scope.fetchBlock(searchValue);
+            } else if ($scope.searchType === 'transaction') {
+                $scope.fetchTransaction(searchValue);
+            } else if ($scope.searchType === 'address') {
+                $scope.fetchAddressData(searchValue);
+            } else if ($scope.searchType === 'blockchain') {
+                $scope.fetchBlockchain();
+            }
+        };
+
+    });
+</script>
+</html>

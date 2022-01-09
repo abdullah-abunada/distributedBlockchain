@@ -1,0 +1,29 @@
+{
+  "name": "application",
+  "version": "1.0.0",
+  "description": "distributed blockchain network for students marks",
+  "main": "src/networkNode.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "node_1": "node_modules/.bin/nodemon --watch dev -e js src/networkNode.js 5001 http://nodeserver1:5001",
+    "node_2": "node_modules/.bin/nodemon --watch dev -e js src/networkNode.js 5002 http://nodeserver2:5002",
+    "node_3": "node_modules/.bin/nodemon --watch dev -e js src/networkNode.js 5003 http://nodeserver3:5003"
+  },
+  "author": "abdullah abunada",
+  "license": "ISC",
+  "devDependencies": {
+    "crypto-js": "^4.0.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "elliptic": "^6.5.4",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7",
+    "process": "^0.11.10",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "sha256": "^0.2.0",
+    "uuid": "^8.3.2"
+  }
+}

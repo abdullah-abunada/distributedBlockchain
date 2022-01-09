@@ -1,0 +1,42 @@
+version: "3.8"
+networks:
+  isolation-network:
+    driver: bridge
+
+services:
+  nodeserver1:
+    build:
+      context: ./app1
+    ports:
+      - "5001:5001"
+    networks:
+      - isolation-network
+  nodeserver2:
+    build:
+      context: ./app2
+    ports:
+      - "5002:5002"
+    networks:
+      - isolation-network
+  nodeserver3:
+      build:
+        context: ./app3
+      ports:
+        - "5003:5003"
+      networks:
+        - isolation-network
+  frontend:
+    build:
+      context: ./front
+    ports:
+      - "3000:3000"
+    networks:
+      - isolation-network
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    networks:
+      - isolation-network

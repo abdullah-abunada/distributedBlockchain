@@ -16,22 +16,22 @@ We used API driven development (ADD) which enables us to focus on creating appli
 
 ### Register new nodes to blockchain network:
 To register new nodes to our blockchain network to be scalable we defined tow endpoints the first one is a register and broadcast node which it responsible for receiving the IP address and the port of new blockchain server and register it on receiver server this server broadcast this new data to all network server then they use the register node endpoint to register this new instance locally.
-<img src="front/application/asset/img/example/1.png" width="100%" align=center />
+<img src="./front/application/asset/img/example/1.png" width="100%" align=center />
 
 ### Add new transactions
 
 To create new transaction the frontend application, communicate with a create and broadcast transaction which it responsible for creating the transaction on receiver server and broadcast the transaction to all network server then they create this transaction locally using transactions endpoint over POST method.
-<img src="front/application/asset/img/example/2.png" width="100%" align=center />
+<img src="./front/application/asset/img/example/2.png" width="100%" align=center />
 
 ### Mine a new block
 
 to mine the transactions into new block the frontend application communicates with /mine endpoint which responsible for mine the new block on receiver server and broadcast the mined block to all network and the other blockchain servers on network and its receive it using /receive-new-block endpoint that responsible for append new block to their chain.
-<img src="front/application/asset/img/example/3.png" width="100%" align=center />
+<img src="./front/application/asset/img/example/3.png" width="100%" align=center />
 
 
 ##  DEMO
 
-<img src="front/application/asset/img/example/example.png" width="100%" align=center />
+<img src="./front/application/asset/img/example/example.png" width="100%" align=center />
 
 ## API
 
